@@ -1,56 +1,63 @@
 #include "sort.h"
-/**
- * swap - swap 2 element in an list
- * @head: head of list
- * @a: node
- * @b: node
- */
-void swap(listint_t *a, listint_t *b, listint_t **head)
-{
-	listint_t *aux1 = NULL, *aux2 = NULL;
 
-	if (a == NULL || b == NULL)
-		return;
-	aux1 = a->prev;
-	aux2 = b->next;
-	/* if nodes are adjacent*/
-	if (aux1)
-		aux1->next = b;
-	if (aux2)
-		aux2->prev = a;
-	a->next = aux2;
-	a->prev = b;
-	b->next = a;
-	b->prev = aux1;
-	if (aux1 == NULL)
-		*head = b;
+/**
+ * swapprev - swaps a node with the previous node in a doubly linked list
+ * @current: the current node
+ * @head: head of the doubly linked list
+ */
+void swapprev(listint_t *current, listint_t **head)
+{
+	listint_t *tmp = NULL;
+
+	tmp = current->prev;
+	if (current->next)
+		current->next->prev = tmp;
+	if (tmp->prev)
+		tmp->prev->next = current;
+	else
+		*head = current;
+
+	current->prev = current->prev->prev;
+	tmp->next = current->next;
+	tmp->prev = current;
+	current->next = tmp;
 }
 /**
- * insertion_sort_list  - insertion_sort_list
- * @list: doubly liked list
- *
+ * insertion_sort_list - implemetnation of insertion sort in
+ * a doubly linked list
+ * @list: a pointer to the head of the list to be sorted
  */
 void insertion_sort_list(listint_t **list)
 {
-	listint_t *head, *prev;
-	int value;
+	listint_t *current = NULL, *prev_tmp = NULL, *prev = NULL;
 
-	if (list == NULL || (*list)->next == NULL || (*list) == NULL)
-	{
+	if (!list)
 		return;
-	}
-	head = *list;
-	while (head)
+	current = *list;
+	while (current)
 	{
-		prev = head->prev;
-				value = head->n;
-
-		while (prev && prev->n > value)
+		prev = current->prev;
+		/*move the current element some steps back until in position*/
+		while (prev)
 		{
-			swap(prev, head, list);
+			if (current->n >= prev->n)
+				break;
+			/*swap the two nodes if they are out of order*/
+			swapprev(current, list);
+
+			/*once the swap is done swap the names*/
+			prev_tmp = prev;
+			prev = current;
+			current = prev_tmp;
 			print_list(*list);
-			prev = head->prev;
+			/*
+			 * go back one step so that the newly swaped(went to left) value
+			 * will be your current and make sure it isn't smaller than
+			 * the value in its left
+			 */
+			prev = prev->prev;
+			current = current->prev;
 		}
-		head = head->next;
+		current = current->next;
 	}
 }
